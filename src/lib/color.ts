@@ -30,3 +30,21 @@ export function contrast(a: string, b: string): number {
 export function readableOn(background: string): string {
   return contrast(INK, background) >= contrast(PAPER, background) ? INK : PAPER;
 }
+
+function toHex(rgb: number[]): string {
+  return `#${rgb.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
+ * The colour itself if it is readable on `background` (WCAG `ratio`, default 4.5 for text),
+ * otherwise the same hue darkened step by step until it is. Used for links and focus rings
+ * on light backgrounds when the primary colour is a bright one.
+ */
+export function inkOn(color: string, background = PAPER, ratio = 4.5): string {
+  const rgb = parseHex(color);
+  for (let keep = 1; keep >= 0; keep -= 0.05) {
+    const candidate = toHex(rgb.map((v) => v * keep));
+    if (contrast(candidate, background) >= ratio) return candidate;
+  }
+  return '#000000';
+}

@@ -1,6 +1,5 @@
-import { cn } from '../lib/cn.ts';
-import { isFullWidth } from '../lib/sections.ts';
-import type { Section } from '../types.ts';
+import { asset } from '../lib/paths.ts';
+import type { Section, SiteConfig } from '../types.ts';
 import { CallToAction } from './CallToAction.tsx';
 import { CardGrid } from './CardGrid.tsx';
 import { FeatureGrid } from './FeatureGrid.tsx';
@@ -8,8 +7,8 @@ import { Showcase } from './Showcase.tsx';
 
 interface Props {
   section: Section;
-  accents: string[];
-  /** Pull this section up over the bottom of the hero (wide screens). */
+  site: SiteConfig;
+  /** Pull this section up into the bottom of the hero. */
   overlapHero: boolean;
 }
 
@@ -21,31 +20,29 @@ function hasTitle(section: Section): boolean {
  * Picks the component for a config section. To add your own section type: add it to the
  * `Section` union in types.ts, write a component, and add a `case` here.
  */
-export function SectionView({ section, accents, overlapHero }: Props) {
+export function SectionView({ section, site, overlapHero }: Props) {
   let body;
   switch (section.type) {
     case 'showcase':
-      body = <Showcase section={section} />;
+      body = <Showcase section={section} overlapHero={overlapHero} />;
       break;
     case 'cards':
-      body = <CardGrid section={section} />;
+      body = <CardGrid section={section} overlapHero={overlapHero} />;
       break;
     case 'features':
-      body = <FeatureGrid section={section} accents={accents} />;
+      body = <FeatureGrid section={section} accents={site.theme.accents} />;
       break;
-    case 'cta':
-      body = <CallToAction section={section} />;
+    case 'cta': {
+      const pattern = site.hero.background?.pattern;
+      body = <CallToAction section={section} pattern={pattern ? asset(pattern) : undefined} />;
       break;
+    }
   }
   return (
     <section
       id={section.id}
       aria-labelledby={hasTitle(section) ? `${section.id}-title` : undefined}
-      className={cn(
-        'scroll-mt-20',
-        isFullWidth(section) ? 'my-16 last:mb-0 md:my-20' : 'relative mx-auto mb-8 max-w-[55rem] px-4 last:mb-16',
-        overlapHero && 'md:-mt-56',
-      )}
+      className="relative scroll-mt-20"
     >
       {body}
     </section>

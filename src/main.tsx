@@ -5,7 +5,7 @@ import './index.css';
 import { applyTheme } from './lib/theme.ts';
 import site from './site.config.ts';
 
-applyTheme(site.theme, document.documentElement);
+applyTheme(site, document.documentElement);
 
 const root = document.getElementById('root');
 if (!root) throw new Error('index.html needs a <div id="root"></div>');

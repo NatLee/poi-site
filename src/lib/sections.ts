@@ -1,6 +1,6 @@
 import type { Section } from '../types.ts';
 
-/** Sections drawn as a full-width band rather than as a card in the centre column. */
-export function isFullWidth(section: Section): boolean {
-  return section.type === 'cta';
+/** Sections that can rise into the bottom of the hero when they come first. */
+export function canOverlapHero(section: Section): boolean {
+  return section.type === 'showcase' || section.type === 'cards';
 }
