@@ -1,0 +1,53 @@
+@import '@fontsource-variable/source-sans-3';
+@import 'tailwindcss';
+
+/* Dark mode follows the `dark` class on <html>, set by the colour-mode switch (and the
+   head script before the first paint). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Fonts: swap the @fontsource import above and this line to change the typeface. */
+  --font-sans: 'Source Sans 3 Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* Overwritten at start-up from theme.primary in site.config.ts; these are fallbacks. */
+  --color-primary: #e89980;
+  --color-on-primary: #1c1917;
+
+  --animate-reveal: reveal-from-top 0.5s ease-out;
+
+  @keyframes reveal-from-top {
+    from {
+      translate: 0 -100%;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    @apply bg-neutral-100 font-sans text-[17px] leading-relaxed font-light text-neutral-600 antialiased dark:bg-neutral-950 dark:text-neutral-300;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-light text-neutral-800 dark:text-neutral-100;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}
