@@ -1,6 +1,7 @@
 import { ArrowLink } from '../components/ArrowLink.tsx';
 import { SectionHeading } from '../components/SectionHeading.tsx';
 import { readableOn } from '../lib/color.ts';
+import { featureColor } from '../lib/defaults.ts';
 import type { FeaturesSection } from '../types.ts';
 
 interface Props {
@@ -18,7 +19,7 @@ export function FeatureGrid({ section, accents }: Props) {
         <ul className="mx-auto grid max-w-5xl gap-x-12 gap-y-12 md:grid-cols-2">
           {section.items.map((feature, i) => {
             const Icon = feature.icon;
-            const color = feature.color ?? accents[i % accents.length] ?? '#64748b';
+            const color = featureColor(feature, i, accents);
             return (
               <li key={feature.title} className="flex gap-5">
                 <span

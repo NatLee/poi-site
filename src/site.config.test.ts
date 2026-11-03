@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { isExternal } from './lib/paths.ts';
 import { parseHex } from './lib/color.ts';
+import { heroBackground } from './lib/defaults.ts';
 import site from './site.config.ts';
 
 const publicDir = fileURLToPath(new URL('../public/', import.meta.url));
@@ -59,7 +60,7 @@ describe('site.config.ts', () => {
   });
 
   it('hero dim is between 0 and 1', () => {
-    const dim = site.hero.background?.dim ?? 0.25;
+    const { dim } = heroBackground(site);
     expect(dim).toBeGreaterThanOrEqual(0);
     expect(dim).toBeLessThanOrEqual(1);
   });

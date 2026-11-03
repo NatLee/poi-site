@@ -1,6 +1,7 @@
 import type { Ref } from 'react';
 import { ButtonLink } from '../components/ButtonLink.tsx';
 import { cn } from '../lib/cn.ts';
+import { heroBackground } from '../lib/defaults.ts';
 import { asset } from '../lib/paths.ts';
 import type { Hero as HeroConfig } from '../types.ts';
 
@@ -16,7 +17,7 @@ interface Props {
  * a soft glow in the primary colour, then the logo or title, the tagline and the buttons.
  */
 export function Hero({ hero, overlap, ref }: Props) {
-  const bg = hero.background ?? {};
+  const bg = heroBackground({ hero });
   return (
     <section
       ref={ref}
@@ -30,11 +31,11 @@ export function Hero({ hero, overlap, ref }: Props) {
       {bg.image && (
         <div
           aria-hidden
-          className={cn('absolute inset-0 -z-30 bg-cover bg-center', (bg.fixed ?? true) && 'md:bg-fixed')}
+          className={cn('absolute inset-0 -z-30 bg-cover bg-center', bg.fixed && 'md:bg-fixed')}
           style={{ backgroundImage: `url("${asset(bg.image)}")` }}
         />
       )}
-      <div aria-hidden className="absolute inset-0 -z-20 bg-ink" style={{ opacity: bg.dim ?? 0.75 }} />
+      <div aria-hidden className="absolute inset-0 -z-20 bg-ink" style={{ opacity: bg.dim }} />
       <div aria-hidden className="absolute inset-x-0 bottom-0 -z-20 h-40 bg-linear-to-t from-ink to-transparent dark:from-slate-950" />
       {bg.pattern && (
         <div

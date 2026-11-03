@@ -1,3 +1,4 @@
+import { darkSurface } from '../lib/defaults.ts';
 import { asset } from '../lib/paths.ts';
 import type { Section, SiteConfig } from '../types.ts';
 import { CallToAction } from './CallToAction.tsx';
@@ -33,8 +34,8 @@ export function SectionView({ section, site, overlapHero }: Props) {
       body = <FeatureGrid section={section} accents={site.theme.accents} />;
       break;
     case 'cta': {
-      const pattern = site.hero.background?.pattern;
-      body = <CallToAction section={section} pattern={pattern ? asset(pattern) : undefined} />;
+      const { texture } = darkSurface(site);
+      body = <CallToAction section={section} texture={texture ? asset(texture) : undefined} />;
       break;
     }
   }

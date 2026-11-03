@@ -1,5 +1,6 @@
 import type { SiteConfig } from '../types.ts';
 import { colorModeScript, storageKey } from './color-mode.ts';
+import { darkSurface } from './defaults.ts';
 import { withBase } from './paths.ts';
 
 function escapeHtml(value: string): string {
@@ -20,7 +21,7 @@ export function renderHead(site: SiteConfig, base: string): string {
   const tags = [
     `<title>${e(meta.title)}</title>`,
     `<meta name="description" content="${e(meta.description)}" />`,
-    `<meta name="theme-color" content="${e(site.hero.background?.color ?? site.theme.primary)}" />`,
+    `<meta name="theme-color" content="${e(darkSurface(site).ink)}" />`,
     `<link rel="icon" href="${e(withBase(meta.favicon, base))}" />`,
     `<meta property="og:type" content="website" />`,
     `<meta property="og:title" content="${e(meta.title)}" />`,

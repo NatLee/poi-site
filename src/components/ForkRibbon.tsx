@@ -1,11 +1,12 @@
 import { readableOn } from '../lib/color.ts';
+import { ribbonColor } from '../lib/defaults.ts';
 import { GitHub } from '../lib/icons.ts';
 import type { SiteConfig } from '../types.ts';
 import { SmartLink } from './SmartLink.tsx';
 
 /** A "Fork me on GitHub" ribbon pinned to the top-right corner. Screens 1024 px and wider; the header leaves room for it. */
 export function ForkRibbon({ ribbon }: { ribbon: NonNullable<SiteConfig['forkRibbon']> }) {
-  const color = ribbon.color ?? '#0f172a';
+  const color = ribbonColor(ribbon);
   return (
     <div className="pointer-events-none fixed top-0 right-0 z-50 hidden size-32 overflow-hidden lg:block">
       <SmartLink

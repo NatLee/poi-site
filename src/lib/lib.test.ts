@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import site from '../site.config.ts';
 import { colorModeScript, nextMode, storageKey } from './color-mode.ts';
 import { contrast, INK, inkOn, PAPER, parseHex, readableOn } from './color.ts';
+import { darkSurface, DEFAULTS, featureColor, heroBackground } from './defaults.ts';
 import { renderHead } from './head.ts';
 import { isExternal, withBase } from './paths.ts';
 
@@ -83,5 +84,29 @@ describe('renderHead', () => {
   it('escapes HTML in config text', () => {
     const evil = renderHead({ ...site, meta: { ...site.meta, title: 'A <b> & "c"' } }, '/');
     expect(evil).toContain('<title>A &lt;b&gt; &amp; &quot;c&quot;</title>');
+  });
+});
+
+describe('defaults', () => {
+  const bare = { hero: { title: 'x', tagline: 'y', actions: [] } };
+
+  it('fills every hero background default from one table', () => {
+    expect(heroBackground(bare)).toEqual({ image: undefined, pattern: undefined, color: DEFAULTS.ink, dim: DEFAULTS.dim, fixed: DEFAULTS.fixed });
+    expect(heroBackground({ hero: { ...bare.hero, background: { dim: 0, fixed: false } } })).toMatchObject({ dim: 0, fixed: false });
+  });
+
+  it('gives the hero and the call-to-action panel the same dark surface', () => {
+    expect(darkSurface(site)).toEqual({ ink: site.hero.background?.color, texture: site.hero.background?.pattern });
+    expect(darkSurface(bare).ink).toBe(DEFAULTS.ink);
+  });
+
+  it('cycles accents for features without a colour, and survives an empty list', () => {
+    expect(featureColor({}, 5, ['#111111', '#222222'])).toBe('#222222');
+    expect(featureColor({ color: '#333333' }, 0, ['#111111'])).toBe('#333333');
+    expect(featureColor({}, 0, [])).toBe(DEFAULTS.accent);
+  });
+
+  it('uses the same ink for the browser theme colour as for the page', () => {
+    expect(renderHead({ ...site, hero: { ...site.hero, background: undefined } }, '/')).toContain(`content="${DEFAULTS.ink}"`);
   });
 });
