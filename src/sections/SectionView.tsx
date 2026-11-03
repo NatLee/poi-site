@@ -1,3 +1,4 @@
+import { titleId } from '../lib/anchors.ts';
 import { cn } from '../lib/cn.ts';
 import { darkSurface } from '../lib/defaults.ts';
 import { asset } from '../lib/paths.ts';
@@ -43,7 +44,7 @@ export function SectionView({ section, site, overlapHero }: Props) {
   return (
     <section
       id={section.id}
-      aria-labelledby={hasTitle(section) ? `${section.id}-title` : undefined}
+      aria-labelledby={hasTitle(section) ? titleId(section.id) : undefined}
       className={cn('relative scroll-mt-[calc(var(--header-height)+1rem)]', overlapHero && 'rise-into-hero')}
     >
       {body}

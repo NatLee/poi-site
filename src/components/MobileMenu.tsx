@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { useEffect, useRef, type RefObject, type TouchEvent } from 'react';
+import { PAGE_IDS } from '../lib/anchors.ts';
 import { cn } from '../lib/cn.ts';
 import { useLabels } from '../lib/labels.ts';
 import { asset } from '../lib/paths.ts';
@@ -92,7 +93,7 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, trigger
       />
       <div
         ref={panelRef}
-        id="mobile-menu"
+        id={PAGE_IDS.menu}
         role="dialog"
         aria-modal="true"
         aria-label={labels.menu}

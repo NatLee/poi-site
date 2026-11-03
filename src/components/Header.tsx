@@ -1,5 +1,6 @@
 import { Menu } from 'lucide-react';
 import type { Ref } from 'react';
+import { PAGE_IDS } from '../lib/anchors.ts';
 import { cn } from '../lib/cn.ts';
 import { useLabels } from '../lib/labels.ts';
 import { asset } from '../lib/paths.ts';
@@ -45,7 +46,7 @@ export function Header({ site, solid, sound, colorMode, menuOpen, onOpenMenu, me
     >
       {site.forkRibbon && <ForkRibbon ribbon={site.forkRibbon} />}
       <div className={cn('mx-auto flex h-(--header-height) max-w-6xl items-center gap-2 px-4 sm:px-6', site.forkRibbon && 'lg:clear-ribbon')}>
-        <a href="#top" className={cn('mr-auto flex items-center gap-2.5 rounded-full text-lg font-bold tracking-tight', tone.text)}>
+        <a href={`#${PAGE_IDS.top}`} className={cn('mr-auto flex items-center gap-2.5 rounded-full text-lg font-bold tracking-tight', tone.text)}>
           {brand.logo && (
             <img src={asset(brand.logo)} alt="" width={36} height={36} className="size-9 rounded-full ring-2 ring-white/20" />
           )}
@@ -77,7 +78,7 @@ export function Header({ site, solid, sound, colorMode, menuOpen, onOpenMenu, me
           ref={menuButtonRef}
           type="button"
           aria-expanded={menuOpen}
-          aria-controls="mobile-menu"
+          aria-controls={PAGE_IDS.menu}
           aria-label={labels.openMenu}
           onClick={onOpenMenu}
           className={cn('grid size-10 cursor-pointer place-items-center rounded-full md:hidden', tone.text, tone.hover)}

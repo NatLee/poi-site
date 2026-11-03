@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react';
 import { asset } from '../lib/paths.ts';
 import { cn } from '../lib/cn.ts';
+import { titleId } from '../lib/anchors.ts';
 import type { ShowcaseSection } from '../types.ts';
 
 interface Props {
@@ -30,7 +31,7 @@ export function Showcase({ section, overlapHero }: Props) {
         </figure>
       )}
       <div className={cn('mx-auto max-w-2xl text-center', image && 'mt-14 sm:mt-16')}>
-        <h2 id={`${section.id}-title`} className="text-3xl sm:text-4xl">
+        <h2 id={titleId(section.id)} className="text-3xl sm:text-4xl">
           {section.title}
         </h2>
         {section.subtitle && <p className="mt-4 text-lg">{section.subtitle}</p>}

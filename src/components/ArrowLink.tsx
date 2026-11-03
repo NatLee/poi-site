@@ -10,7 +10,7 @@ interface Props {
   className?: string;
 }
 
-/** A text link with an arrow that nudges right on hover, used at the bottom of cards. */
+/** A text link with an arrow that nudges right when the link, or the card (`group/card`) it sits in, is hovered. */
 export function ArrowLink({ link, stretched = false, className }: Props) {
   return (
     <SmartLink
@@ -24,7 +24,7 @@ export function ArrowLink({ link, stretched = false, className }: Props) {
       {link.label}
       <ArrowRight
         aria-hidden
-        className="size-4 transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover:translate-x-0.5"
+        className="size-4 transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover/card:translate-x-0.5"
       />
     </SmartLink>
   );

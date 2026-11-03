@@ -1,5 +1,6 @@
 import { ArrowLink } from '../components/ArrowLink.tsx';
 import { SectionHeading } from '../components/SectionHeading.tsx';
+import { titleId } from '../lib/anchors.ts';
 import { readableOn } from '../lib/color.ts';
 import { featureColor } from '../lib/defaults.ts';
 import type { FeaturesSection } from '../types.ts';
@@ -15,7 +16,7 @@ export function FeatureGrid({ section, accents }: Props) {
   return (
     <div className="border-y border-slate-200 bg-slate-50 py-20 sm:py-28 dark:border-white/5 dark:bg-slate-900/40">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {section.title && <SectionHeading id={`${section.id}-title`} title={section.title} intro={section.intro} className="mb-14" />}
+        {section.title && <SectionHeading id={titleId(section.id)} title={section.title} intro={section.intro} className="mb-14" />}
         <ul className="mx-auto grid max-w-5xl gap-x-12 gap-y-12 md:grid-cols-2">
           {section.items.map((feature, i) => {
             const Icon = feature.icon;

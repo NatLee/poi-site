@@ -4,6 +4,7 @@ import { MobileMenu } from './components/MobileMenu.tsx';
 import { useColorMode } from './hooks/useColorMode.ts';
 import { useScrolledPast } from './hooks/useScrolledPast.ts';
 import { useSound } from './hooks/useSound.ts';
+import { PAGE_IDS } from './lib/anchors.ts';
 import { resolveLabels } from './lib/defaults.ts';
 import { LabelsContext } from './lib/labels.ts';
 import { asset } from './lib/paths.ts';
@@ -30,14 +31,14 @@ export function App({ site }: { site: SiteConfig }) {
   return (
     <LabelsContext value={labels}>
       <a
-        href="#main"
+        href={`#${PAGE_IDS.main}`}
         className="sr-only z-[70] rounded-lg bg-white px-4 py-2 font-semibold text-slate-900 shadow-lg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
         {labels.skipToContent}
       </a>
 
       {/* While the phone menu is open, the page behind it cannot be clicked or tabbed into. */}
-      <div id="top" inert={menuOpen}>
+      <div id={PAGE_IDS.top} inert={menuOpen}>
         <Header
           site={site}
           solid={solidHeader}
@@ -47,7 +48,7 @@ export function App({ site }: { site: SiteConfig }) {
           {...controls}
         />
         <Hero ref={heroRef} hero={site.hero} overlap={overlap} />
-        <main id="main" tabIndex={-1} className="outline-none">
+        <main id={PAGE_IDS.main} tabIndex={-1} className="outline-none">
           {site.sections.map((section, i) => (
             <SectionView key={section.id} section={section} site={site} overlapHero={i === 0 && overlap} />
           ))}

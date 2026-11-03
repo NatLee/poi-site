@@ -1,5 +1,6 @@
 import type { Ref } from 'react';
 import { ButtonLink } from '../components/ButtonLink.tsx';
+import { PAGE_IDS, titleId } from '../lib/anchors.ts';
 import { cn } from '../lib/cn.ts';
 import { heroBackground } from '../lib/defaults.ts';
 import { asset } from '../lib/paths.ts';
@@ -22,7 +23,7 @@ export function Hero({ hero, overlap, ref }: Props) {
     <section
       ref={ref}
       data-surface="dark"
-      aria-labelledby="hero-title"
+      aria-labelledby={titleId(PAGE_IDS.hero)}
       className={cn(
         'relative isolate overflow-hidden bg-ink px-4 pt-32 text-center text-white sm:pt-40',
         overlap ? 'pb-hero-overlap' : 'pb-24 sm:pb-32',
@@ -49,7 +50,7 @@ export function Hero({ hero, overlap, ref }: Props) {
         className="absolute top-24 left-1/2 -z-10 h-[28rem] w-[min(60rem,140vw)] -translate-x-1/2 rounded-full bg-primary/25 blur-3xl"
       />
 
-      <h1 id="hero-title" className="mx-auto max-w-[32rem] text-5xl leading-tight text-white sm:text-6xl">
+      <h1 id={titleId(PAGE_IDS.hero)} className="mx-auto max-w-[32rem] text-5xl leading-tight text-white sm:text-6xl">
         {hero.logo ? (
           <img
             src={asset(hero.logo.src)}
