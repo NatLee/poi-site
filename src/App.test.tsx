@@ -148,16 +148,15 @@ describe('mobile menu', () => {
     expect(isOpen()).toBe(false);
   });
 
-  it('does not stay open on a screen wide enough for the desktop header', async () => {
+  it('closes when the window gets wide enough that CSS hides the menu button', async () => {
     const user = userEvent.setup();
     renderApp();
-    media.isDesktop = true;
-    try {
-      await user.click(screen.getByRole('button', { name: 'Open menu' }));
-      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
-    } finally {
-      media.isDesktop = false;
-    }
+    const open = screen.getByRole('button', { name: 'Open menu' });
+    await user.click(open);
+    expect(open).toHaveAttribute('aria-expanded', 'true');
+    open.style.display = 'none'; // what md:hidden does on a wide screen
+    fireEvent(window, new Event('resize'));
+    expect(open).toHaveAttribute('aria-expanded', 'false');
   });
 });
 

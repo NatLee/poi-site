@@ -52,7 +52,7 @@ export function App({ site }: { site: SiteConfig }) {
         <Footer footer={site.footer} brand={site.brand} />
       </div>
 
-      <MobileMenu site={site} open={menuOpen} onOpenChange={setMenuOpen} returnFocusTo={menuButtonRef} {...controls} />
+      <MobileMenu site={site} open={menuOpen} onOpenChange={setMenuOpen} trigger={menuButtonRef} {...controls} />
     </>
   );
 }

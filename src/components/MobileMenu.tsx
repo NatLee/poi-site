@@ -9,21 +9,19 @@ import type { HeaderControls } from './Header.tsx';
 import { SmartLink } from './SmartLink.tsx';
 import { SoundButton } from './SoundButton.tsx';
 
-const DESKTOP = '(min-width: 48rem)';
-
 interface Props extends HeaderControls {
   site: SiteConfig;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** The header's menu button; focus returns to it when the menu closes. */
-  returnFocusTo: RefObject<HTMLButtonElement | null>;
+  /** The header's menu button. Focus returns to it on close, and the menu closes when CSS hides it (wide screens). */
+  trigger: RefObject<HTMLButtonElement | null>;
 }
 
 /**
  * Small-screen navigation: a panel that slides in from the right over a dimmed page.
  * Tapping a link, tapping outside, pressing Escape or swiping right closes it.
  */
-export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnFocusTo }: Props) {
+export function MobileMenu({ site, open, onOpenChange, sound, colorMode, trigger }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const wasOpen = useRef(false);
@@ -33,9 +31,9 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnF
   // Focus: move into the panel when it opens, back to the menu button when it closes.
   useEffect(() => {
     if (open) panelRef.current?.querySelector<HTMLElement>('nav a')?.focus();
-    else if (wasOpen.current) returnFocusTo.current?.focus();
+    else if (wasOpen.current) trigger.current?.focus();
     wasOpen.current = open;
-  }, [open, returnFocusTo]);
+  }, [open, trigger]);
 
   // Escape closes; the page behind does not scroll while the panel is open.
   useEffect(() => {
@@ -53,15 +51,18 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnF
     };
   }, [open, onOpenChange]);
 
-  // Widening the window past the breakpoint closes the panel (the header shows the links there).
+  // The menu only exists while its button is shown. Where CSS hides the button (the header
+  // shows the links instead), close the menu, so the breakpoint lives in one place: the CSS.
   useEffect(() => {
-    if (!open || typeof matchMedia !== 'function') return;
-    const query = matchMedia(DESKTOP);
-    const onChange = () => query.matches && onOpenChange(false);
-    onChange();
-    query.addEventListener('change', onChange);
-    return () => query.removeEventListener('change', onChange);
-  }, [open, onOpenChange]);
+    if (!open) return;
+    const closeIfButtonHidden = () => {
+      const button = trigger.current;
+      if (button && getComputedStyle(button).display === 'none') onOpenChange(false);
+    };
+    closeIfButtonHidden();
+    window.addEventListener('resize', closeIfButtonHidden);
+    return () => window.removeEventListener('resize', closeIfButtonHidden);
+  }, [open, onOpenChange, trigger]);
 
   const onTouchStart = (e: TouchEvent) => {
     const t = e.touches[0];
