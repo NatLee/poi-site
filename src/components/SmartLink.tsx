@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes } from 'react';
+import { useLabels } from '../lib/labels.ts';
 import { asset } from '../lib/paths.ts';
 import type { Link } from '../types.ts';
 
@@ -9,6 +10,7 @@ type Props = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'target'> & 
 /** An <a> for config links: adds the base path to local files and handles `newTab` safely. */
 export function SmartLink({ link, children, rel, ...rest }: Props) {
   const newTab = link.newTab ?? false;
+  const labels = useLabels();
   return (
     <a
       href={asset(link.href)}
@@ -17,7 +19,7 @@ export function SmartLink({ link, children, rel, ...rest }: Props) {
       {...rest}
     >
       {children}
-      {newTab && <span className="sr-only"> (opens in a new tab)</span>}
+      {newTab && <span className="sr-only"> {labels.opensInNewTab}</span>}
     </a>
   );
 }

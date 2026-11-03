@@ -49,6 +49,32 @@ export interface Image {
 
 export type ColorMode = 'light' | 'dark' | 'system';
 
+/**
+ * Words the page uses for its own controls, mostly for screen readers. English by default;
+ * set the ones you need when `meta.lang` is another language.
+ */
+export interface Labels {
+  /** Link at the very top that keyboard users can use to jump past the header. */
+  skipToContent: string;
+  /** Name of the navigation, read out by screen readers. */
+  navigation: string;
+  openMenu: string;
+  closeMenu: string;
+  /** Name of the phone menu panel. */
+  menu: string;
+  /** Read out after links that open in a new tab. */
+  opensInNewTab: string;
+  colorSystem: string;
+  colorLight: string;
+  colorDark: string;
+  /** Read out for the colour-mode button. `{current}` and `{next}` become mode names. */
+  colorModeButton: string;
+  /** Shown next to the colour-mode icon in the phone menu, and as its tooltip. `{current}` becomes the mode name. */
+  colorModeShort: string;
+  /** Shown instead of the page when JavaScript is turned off. */
+  noscript: string;
+}
+
 export interface SiteConfig {
   /** What browsers, search engines and link previews see. */
   meta: {
@@ -109,6 +135,9 @@ export interface SiteConfig {
 
   /** The page body, top to bottom. Add, remove or reorder freely. */
   sections: Section[];
+
+  /** Words for the page's own controls (screen-reader names, the skip link, …). Leave out to use English. */
+  labels?: Partial<Labels>;
 
   footer: {
     /** Icon links, e.g. GitHub, X, Discord. */

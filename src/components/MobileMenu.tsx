@@ -1,6 +1,7 @@
 import { X } from 'lucide-react';
 import { useEffect, useRef, type RefObject, type TouchEvent } from 'react';
 import { cn } from '../lib/cn.ts';
+import { useLabels } from '../lib/labels.ts';
 import { asset } from '../lib/paths.ts';
 import { panelTone } from '../lib/tone.ts';
 import type { SiteConfig } from '../types.ts';
@@ -25,6 +26,7 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, trigger
   const panelRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const wasOpen = useRef(false);
+  const labels = useLabels();
 
   const close = () => onOpenChange(false);
 
@@ -93,7 +95,7 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, trigger
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
-        aria-label="Menu"
+        aria-label={labels.menu}
         inert={!open}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
@@ -113,14 +115,14 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, trigger
           </span>
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={labels.closeMenu}
             onClick={close}
             className={cn('grid size-10 cursor-pointer place-items-center rounded-full', panelTone.text, panelTone.hover)}
           >
             <X aria-hidden className="size-5" />
           </button>
         </div>
-        <nav aria-label="Main" className="px-3 py-4">
+        <nav aria-label={labels.navigation} className="px-3 py-4">
           <ul className="space-y-1">
             {site.nav.map((link) => (
               <li key={link.label}>

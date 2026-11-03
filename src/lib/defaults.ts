@@ -1,4 +1,4 @@
-import type { Feature, SiteConfig } from '../types.ts';
+import type { ColorMode, Feature, Labels, SiteConfig } from '../types.ts';
 
 /**
  * Every value the site falls back to when the config leaves something out, in one place.
@@ -17,7 +17,37 @@ export const DEFAULTS = {
   ribbonColor: '#0f172a',
   /** Feature tile colour, only used when `theme.accents` is empty. */
   accent: '#64748b',
+  /** Words for the page's own controls. */
+  labels: {
+    skipToContent: 'Skip to content',
+    navigation: 'Main',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    menu: 'Menu',
+    opensInNewTab: '(opens in a new tab)',
+    colorSystem: 'System',
+    colorLight: 'Light',
+    colorDark: 'Dark',
+    colorModeButton: 'Color theme: {current}. Switch to {next}.',
+    colorModeShort: 'Theme: {current}',
+    noscript: 'This page needs JavaScript to show its content.',
+  } satisfies Labels,
 } as const;
+
+/** The config's labels over the English defaults. */
+export function resolveLabels(site: Pick<SiteConfig, 'labels'>): Labels {
+  return { ...DEFAULTS.labels, ...site.labels };
+}
+
+/** The label for one colour mode. */
+export function colorModeName(labels: Labels, mode: ColorMode): string {
+  return { system: labels.colorSystem, light: labels.colorLight, dark: labels.colorDark }[mode];
+}
+
+/** Fills `{name}` placeholders in a label. */
+export function fill(template: string, values: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
+}
 
 /** The hero background with every default filled in. */
 export function heroBackground(site: Pick<SiteConfig, 'hero'>) {

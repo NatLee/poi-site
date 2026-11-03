@@ -1,6 +1,7 @@
 import { Menu } from 'lucide-react';
 import type { Ref } from 'react';
 import { cn } from '../lib/cn.ts';
+import { useLabels } from '../lib/labels.ts';
 import { asset } from '../lib/paths.ts';
 import { headerTone } from '../lib/tone.ts';
 import type { ColorMode, SiteConfig } from '../types.ts';
@@ -31,6 +32,7 @@ interface Props extends HeaderControls {
 export function Header({ site, solid, sound, colorMode, menuOpen, onOpenMenu, menuButtonRef }: Props) {
   const { brand, nav } = site;
   const tone = headerTone;
+  const labels = useLabels();
   return (
     <header
       data-solid={solid}
@@ -50,7 +52,7 @@ export function Header({ site, solid, sound, colorMode, menuOpen, onOpenMenu, me
           {brand.name}
         </a>
 
-        <nav aria-label="Main" className="hidden md:block">
+        <nav aria-label={labels.navigation} className="hidden md:block">
           <ul className="flex items-center gap-1">
             {nav.map((link) => (
               <li key={link.label}>
@@ -76,7 +78,7 @@ export function Header({ site, solid, sound, colorMode, menuOpen, onOpenMenu, me
           type="button"
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
-          aria-label="Open menu"
+          aria-label={labels.openMenu}
           onClick={onOpenMenu}
           className={cn('grid size-10 cursor-pointer place-items-center rounded-full md:hidden', tone.text, tone.hover)}
         >

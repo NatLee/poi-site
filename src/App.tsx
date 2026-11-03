@@ -1,9 +1,11 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Header, type HeaderControls } from './components/Header.tsx';
 import { MobileMenu } from './components/MobileMenu.tsx';
 import { useColorMode } from './hooks/useColorMode.ts';
 import { useScrolledPast } from './hooks/useScrolledPast.ts';
 import { useSound } from './hooks/useSound.ts';
+import { resolveLabels } from './lib/defaults.ts';
+import { LabelsContext } from './lib/labels.ts';
 import { asset } from './lib/paths.ts';
 import { canOverlapHero } from './lib/sections.ts';
 import { Footer } from './sections/Footer.tsx';
@@ -20,17 +22,18 @@ export function App({ site }: { site: SiteConfig }) {
   const { mode, setMode } = useColorMode(site.theme.defaultMode);
   const [menuOpen, setMenuOpen] = useState(false);
   const openMenu = useCallback(() => setMenuOpen(true), []);
+  const labels = useMemo(() => resolveLabels(site), [site]);
 
   const controls: HeaderControls = { sound, colorMode: { mode, setMode } };
   const overlap = site.sections.length > 0 && canOverlapHero(site.sections[0]);
 
   return (
-    <>
+    <LabelsContext value={labels}>
       <a
         href="#main"
         className="sr-only z-[70] rounded-lg bg-white px-4 py-2 font-semibold text-slate-900 shadow-lg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
-        Skip to content
+        {labels.skipToContent}
       </a>
 
       {/* While the phone menu is open, the page behind it cannot be clicked or tabbed into. */}
@@ -53,6 +56,6 @@ export function App({ site }: { site: SiteConfig }) {
       </div>
 
       <MobileMenu site={site} open={menuOpen} onOpenChange={setMenuOpen} trigger={menuButtonRef} {...controls} />
-    </>
+    </LabelsContext>
   );
 }
