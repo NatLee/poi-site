@@ -5,7 +5,7 @@ import type { ShowcaseSection } from '../types.ts';
 
 interface Props {
   section: ShowcaseSection;
-  /** Pull the image up into the hero. */
+  /** The section rises into the hero (SectionView does the pull-up), so skip the top padding. */
   overlapHero: boolean;
 }
 
@@ -13,7 +13,7 @@ interface Props {
 export function Showcase({ section, overlapHero }: Props) {
   const { image } = section;
   return (
-    <div className={cn('mx-auto max-w-6xl px-4 pb-20 sm:px-6 sm:pb-28', overlapHero ? '-mt-28 sm:-mt-40 lg:-mt-48' : 'pt-20 sm:pt-28')}>
+    <div className={cn('mx-auto max-w-6xl px-4 pb-20 sm:px-6 sm:pb-28', !overlapHero && 'pt-20 sm:pt-28')}>
       {image && (
         <figure className="relative mx-auto" style={{ maxWidth: image.width }}>
           <div aria-hidden className="absolute -inset-x-6 -top-6 bottom-10 -z-10 rounded-[2.5rem] bg-primary/30 blur-3xl" />

@@ -1,3 +1,4 @@
+import { cn } from '../lib/cn.ts';
 import { darkSurface } from '../lib/defaults.ts';
 import { asset } from '../lib/paths.ts';
 import type { Section, SiteConfig } from '../types.ts';
@@ -9,7 +10,7 @@ import { Showcase } from './Showcase.tsx';
 interface Props {
   section: Section;
   site: SiteConfig;
-  /** Pull this section up into the bottom of the hero. */
+  /** Pull this section up into the bottom of the hero (by --hero-overlap, see index.css). */
   overlapHero: boolean;
 }
 
@@ -43,7 +44,7 @@ export function SectionView({ section, site, overlapHero }: Props) {
     <section
       id={section.id}
       aria-labelledby={hasTitle(section) ? `${section.id}-title` : undefined}
-      className="relative scroll-mt-20"
+      className={cn('relative scroll-mt-[calc(var(--header-height)+1rem)]', overlapHero && 'rise-into-hero')}
     >
       {body}
     </section>

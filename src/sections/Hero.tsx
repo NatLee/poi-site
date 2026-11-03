@@ -25,7 +25,7 @@ export function Hero({ hero, overlap, ref }: Props) {
       aria-labelledby="hero-title"
       className={cn(
         'relative isolate overflow-hidden bg-ink px-4 pt-32 text-center text-white sm:pt-40',
-        overlap ? 'pb-40 sm:pb-56 lg:pb-64' : 'pb-24 sm:pb-32',
+        overlap ? 'pb-hero-overlap' : 'pb-24 sm:pb-32',
       )}
     >
       {bg.image && (
@@ -36,7 +36,7 @@ export function Hero({ hero, overlap, ref }: Props) {
         />
       )}
       <div aria-hidden className="absolute inset-0 -z-20 bg-ink" style={{ opacity: bg.dim }} />
-      <div aria-hidden className="absolute inset-x-0 bottom-0 -z-20 h-40 bg-linear-to-t from-ink to-transparent dark:from-slate-950" />
+      <div aria-hidden className="absolute inset-x-0 bottom-0 -z-20 h-40 bg-linear-to-t from-ink to-transparent dark:from-page" />
       {bg.pattern && (
         <div
           aria-hidden

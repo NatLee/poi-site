@@ -103,7 +103,7 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnF
           open ? 'translate-x-0 shadow-2xl' : 'invisible translate-x-full',
         )}
       >
-        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 dark:border-white/10">
+        <div className="flex h-(--header-height) items-center justify-between border-b border-slate-200 px-4 dark:border-white/10">
           <span className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-slate-900 dark:text-white">
             {site.brand.logo && (
               <img src={asset(site.brand.logo)} alt="" width={32} height={32} className="size-8 rounded-full" />

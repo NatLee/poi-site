@@ -6,14 +6,14 @@ import type { CardsSection } from '../types.ts';
 
 interface Props {
   section: CardsSection;
-  /** Pull the cards up into the hero. */
+  /** The section rises into the hero (SectionView does the pull-up), so skip the top padding. */
   overlapHero: boolean;
 }
 
 /** Cards with an image on top, then title, text and an arrow link. Two per row from 768 px. */
 export function CardGrid({ section, overlapHero }: Props) {
   return (
-    <div className={cn('mx-auto max-w-6xl px-4 pb-20 sm:px-6 sm:pb-28', overlapHero ? '-mt-28 sm:-mt-40' : 'pt-4')}>
+    <div className={cn('mx-auto max-w-6xl px-4 pb-20 sm:px-6 sm:pb-28', !overlapHero && 'pt-4')}>
       {section.title && <SectionHeading id={`${section.id}-title`} title={section.title} intro={section.intro} className="mb-12" />}
       <ul className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
         {section.items.map((card) => (
