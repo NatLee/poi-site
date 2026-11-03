@@ -1,6 +1,6 @@
 import type { SiteConfig } from '../types.ts';
 import { colorModeScript, storageKey } from './color-mode.ts';
-import { darkSurface } from './defaults.ts';
+import { darkSurface, resolveLabels } from './defaults.ts';
 import { withBase } from './paths.ts';
 
 function escapeHtml(value: string): string {
@@ -37,4 +37,21 @@ export function renderHead(site: SiteConfig, base: string): string {
   }
   tags.push(`<script>${colorModeScript(storageKey(base), site.theme.defaultMode)}</script>`);
   return tags.join('\n    ');
+}
+
+/**
+ * Fills the placeholders in index.html from the config. Every placeholder must be there:
+ * a missing one fails the build instead of silently shipping a page without it.
+ */
+export function fillIndexHtml(html: string, site: SiteConfig, base: string): string {
+  const slots: Record<string, string> = {
+    '%SITE_LANG%': escapeHtml(site.meta.lang),
+    '<!-- site-head -->': renderHead(site, base),
+    '%SITE_NOSCRIPT%': escapeHtml(resolveLabels(site).noscript),
+  };
+  for (const [slot, value] of Object.entries(slots)) {
+    if (!html.includes(slot)) throw new Error(`index.html has no ${slot} placeholder (filled from site.config.ts at build time)`);
+    html = html.replaceAll(slot, value);
+  }
+  return html;
 }

@@ -1,37 +1,31 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vitest/config';
-import { renderHead } from './src/lib/head.ts';
+import { fillIndexHtml } from './src/lib/head.ts';
+import { resolveBase } from './src/lib/paths.ts';
 import site from './src/site.config.ts';
 
 /**
- * Where the site lives on the web server. GitHub Pages project sites are served from
- * `/<repo-name>/`, so this repo defaults to `/poi-site/`. The deploy workflow sets
- * BASE_PATH from the repository name, so a copy of this template deploys correctly
- * without editing this file. Use `BASE_PATH=/ npm run build` for a site served from the root.
+ * Where the site lives on the web server: `BASE_PATH` if set (the deploy workflow sets it
+ * from GitHub Pages), else the path of `meta.url` in site.config.ts, else `/`.
+ * See resolveBase() in src/lib/paths.ts.
  */
-const base = normalizeBase(process.env.BASE_PATH ?? '/poi-site/');
+const base = resolveBase(process.env.BASE_PATH, site.meta.url);
 
-function normalizeBase(value: string): string {
-  const trimmed = value.trim().replace(/^\/+|\/+$/g, '');
-  return trimmed ? `/${trimmed}/` : '/';
-}
-
-/** Fills the page <head> (title, description, favicon, social tags, theme script) from site.config.ts. */
-function siteHead(): Plugin {
+/** Fills index.html (language, <head> tags, no-JavaScript message) from site.config.ts. */
+function siteHtml(): Plugin {
   return {
-    name: 'site-head',
-    transformIndexHtml(html) {
-      return html
-        .replace('<html lang="en">', `<html lang="${site.meta.lang}">`)
-        .replace('<!-- site-head -->', renderHead(site, base));
+    name: 'site-html',
+    transformIndexHtml: {
+      order: 'pre',
+      handler: (html) => fillIndexHtml(html, site, base),
     },
   };
 }
 
 export default defineConfig({
   base,
-  plugins: [react(), tailwindcss(), siteHead()],
+  plugins: [react(), tailwindcss(), siteHtml()],
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

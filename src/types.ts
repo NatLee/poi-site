@@ -85,7 +85,11 @@ export interface SiteConfig {
     lang: string;
     /** Path in `public/` to the tab icon (PNG, SVG or ICO). */
     favicon: string;
-    /** Full public URL of the site. Needed only for the social preview image. */
+    /**
+     * Full public URL of the site, e.g. `https://you.github.io/my-site/`. Its path (`/my-site/`) is
+     * where the build expects to be served from (the deploy workflow can override it), and it is
+     * needed for the social preview image. Leave it out for a site at the root of a domain.
+     */
     url?: string;
     /** Path in `public/` to the image shown in link previews (Slack, Discord, X, …). Needs `url`. */
     image?: string;
