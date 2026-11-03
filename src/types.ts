@@ -73,9 +73,13 @@ export interface SiteConfig {
   };
 
   theme: {
-    /** Main colour (hex). Used for the call-to-action band, links and focus rings. Text on it picks black or white automatically for contrast. */
+    /**
+     * Main colour (hex). Used for solid buttons, links, highlights, focus rings and the glow in the
+     * hero. Text on buttons picks black or white for contrast, and links on white get a darker
+     * shade of the same colour automatically when the colour itself is too light to read.
+     */
     primary: string;
-    /** Feature icon colours (hex). Features without their own `color` take these in turn. */
+    /** Feature icon tile colours (hex). Features without their own `color` take these in turn. */
     accents: string[];
     /** Colour mode for first-time visitors. `system` follows the visitor's OS setting. */
     defaultMode: ColorMode;
@@ -93,11 +97,11 @@ export interface SiteConfig {
     label: string;
   };
 
-  /** Optional "Fork me on GitHub" corner ribbon (wide screens only). Leave it out to hide it. */
+  /** Optional "Fork me on GitHub" ribbon in the top-right corner (screens 1024 px and wider). Leave it out to hide it. */
   forkRibbon?: {
     href: string;
     label: string;
-    /** Ribbon colour (hex). Default: GitHub's classic red `#aa0000`. */
+    /** Ribbon colour (hex). Default: dark slate `#0f172a`. */
     color?: string;
   };
 
@@ -110,12 +114,14 @@ export interface SiteConfig {
     /** Icon links, e.g. GitHub, X, Discord. */
     social: SocialLink[];
     copyright: string;
-    /** Credit line, e.g. for the design or a licence that asks for attribution. */
+    /** Small print under the footer, e.g. who owns the images and under what terms. */
+    note?: string;
+    /** Credit line with a link, e.g. "Built with <template>" or a licence that asks for attribution. */
     credits?: Link & { prefix?: string };
   };
 }
 
-/** The big banner at the top. */
+/** The dark banner at the top. */
 export interface Hero {
   /** Main heading. When `logo` is set it becomes the logo's alt text instead of visible text. */
   title: string;
@@ -126,11 +132,11 @@ export interface Hero {
   background?: {
     /** Path in `public/` to the background photo. */
     image?: string;
-    /** Path in `public/` to a small tile repeated over the photo (texture). */
+    /** Path in `public/` to a small tile repeated over the photo, fading out towards the edges (texture). */
     pattern?: string;
-    /** Colour behind everything (hex), also shown while the photo loads. */
+    /** Dark base colour (hex) behind the photo. Also used for the call-to-action panel. Default: `#0b1120`. */
     color?: string;
-    /** Darken the background so white text stays readable: 0 (none) to 1 (black). Default: 0.25. */
+    /** How much of `color` to lay over the photo, so white text stays readable: 0 (photo as is) to 1 (photo hidden). Default: 0.75. */
     dim?: number;
     /** Keep the photo still while the page scrolls (parallax feel, wide screens only). Default: true. */
     fixed?: boolean;
@@ -142,19 +148,26 @@ interface SectionBase {
   id: string;
 }
 
-/** A card with a heading and a big image, e.g. a product screenshot. */
+/**
+ * A big framed image (e.g. a product screenshot) with a heading below it. As the first section
+ * it rises into the hero.
+ */
 export interface ShowcaseSection extends SectionBase {
   type: 'showcase';
   title: string;
   subtitle?: string;
+  /** Short keywords shown as pills under the heading. */
+  highlights?: string[];
   image?: Image;
 }
 
-/** Side-by-side cards (two per row on wide screens). */
+/** Cards with an image on top, two per row on wide screens. The whole card is clickable when it has an `action`. */
 export interface CardsSection extends SectionBase {
   type: 'cards';
   /** Optional heading above the cards. */
   title?: string;
+  /** Optional sentence under the heading. */
+  intro?: string;
   items: Card[];
 }
 
@@ -165,11 +178,13 @@ export interface Card {
   action?: Link;
 }
 
-/** A grid of features with round coloured icons (two per row on wide screens). */
+/** Features with a coloured icon tile, two per row on wide screens, on a tinted full-width band. */
 export interface FeaturesSection extends SectionBase {
   type: 'features';
   /** Optional heading above the grid. */
   title?: string;
+  /** Optional sentence under the heading. */
+  intro?: string;
   items: Feature[];
 }
 
@@ -177,12 +192,12 @@ export interface Feature {
   title: string;
   text: string;
   icon: Icon;
-  /** Icon background (hex). Default: the next colour from `theme.accents`. */
+  /** Icon tile colour (hex). Default: the next colour from `theme.accents`. */
   color?: string;
   action?: Link;
 }
 
-/** A full-width coloured band with a short message, e.g. "Get started" or "Thanks to our contributors". */
+/** A dark rounded panel with a glow and a short message, e.g. "Get started" or "Thanks to our contributors". */
 export interface CallToActionSection extends SectionBase {
   type: 'cta';
   title: string;

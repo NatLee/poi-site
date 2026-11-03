@@ -16,7 +16,9 @@
  * Brand logos such as GitHub live in `src/lib/icons.ts`.
  *
  * The content below is the demo: a landing page for poi, a KanColle browser
- * (https://github.com/poooi/poi). poi, its name, logo and screenshots belong to the poooi team.
+ * (https://github.com/poooi/poi). poi's name, logo, screenshots and sound belong to the poooi team
+ * and are used here with their permission. They are not covered by this repo's MIT licence:
+ * replace every file in public/ (and the texts below) with your own before you publish.
  */
 import { ChartArea, Cloud, Lock, Zap } from 'lucide-react';
 import { GitHub } from './lib/icons.ts';
@@ -40,8 +42,8 @@ const site: SiteConfig = {
   },
 
   theme: {
-    primary: '#e89980',
-    accents: ['#e89980', '#7fcdb8', '#90b0ba', '#e5cb95'],
+    primary: '#2dd4bf',
+    accents: ['#2dd4bf', '#38bdf8', '#a78bfa', '#fbbf24'],
     defaultMode: 'system',
     toggle: true,
   },
@@ -59,6 +61,7 @@ const site: SiteConfig = {
   forkRibbon: {
     href: 'https://github.com/NatLee/poi-site',
     label: 'Fork me on GitHub',
+    color: '#0f766e',
   },
 
   hero: {
@@ -72,9 +75,9 @@ const site: SiteConfig = {
     ],
     background: {
       image: 'images/banner.png',
-      pattern: 'images/overlay.png',
-      color: '#666666',
-      dim: 0.25,
+      pattern: 'images/texture.svg',
+      color: '#0b1120',
+      dim: 0.78,
       fixed: true,
     },
   },
@@ -84,7 +87,7 @@ const site: SiteConfig = {
       type: 'showcase',
       id: 'features',
       title: 'Features',
-      subtitle: 'Proxy / Cache / Analysis / Notification / Plugin Support',
+      highlights: ['Proxy', 'Cache', 'Analysis', 'Notification', 'Plugin Support'],
       image: { src: 'images/pic01.png', alt: 'Screenshot of poi', width: 803, height: 922 },
     },
     {
@@ -108,6 +111,7 @@ const site: SiteConfig = {
     {
       type: 'features',
       id: 'built-with',
+      title: 'Built with',
       items: [
         {
           title: 'Electron',
@@ -140,13 +144,18 @@ const site: SiteConfig = {
       id: 'contributors',
       title: 'Contributors',
       text: 'poi poi poi poi',
+      actions: [
+        { label: 'Meet the contributors', href: `${POI_REPO}/graphs/contributors`, variant: 'solid' },
+        { label: 'Get poi', href: `${POI_REPO}/releases` },
+      ],
     },
   ],
 
   footer: {
     social: [{ label: 'GitHub', href: POI_REPO, icon: GitHub }],
     copyright: '© POI. All rights reserved.',
-    credits: { prefix: 'Design:', label: 'HTML5 UP', href: 'https://html5up.net' },
+    note: 'poi, its logo, screenshots and sound belong to the poooi team and are used with their permission.',
+    credits: { prefix: 'Built with', label: 'poi-site (MIT)', href: 'https://github.com/NatLee/poi-site' },
   },
 };
 

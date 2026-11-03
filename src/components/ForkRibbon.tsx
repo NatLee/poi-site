@@ -1,18 +1,20 @@
 import { readableOn } from '../lib/color.ts';
+import { GitHub } from '../lib/icons.ts';
 import type { SiteConfig } from '../types.ts';
 import { SmartLink } from './SmartLink.tsx';
 
-/** The classic "Fork me on GitHub" corner ribbon, drawn with CSS (no image to go stale). Lives in the desktop header. */
+/** A "Fork me on GitHub" ribbon pinned to the top-right corner. Screens 1024 px and wider; the header leaves room for it. */
 export function ForkRibbon({ ribbon }: { ribbon: NonNullable<SiteConfig['forkRibbon']> }) {
-  const color = ribbon.color ?? '#aa0000';
+  const color = ribbon.color ?? '#0f172a';
   return (
-    <div className="pointer-events-none absolute top-0 left-0 z-50 size-[149px] overflow-hidden">
+    <div className="pointer-events-none fixed top-0 right-0 z-50 hidden size-32 overflow-hidden lg:block">
       <SmartLink
         link={ribbon}
-        className="pointer-events-auto absolute top-[42px] left-[-58px] block w-[230px] -rotate-45 py-[3px] text-center text-[13px] leading-tight font-semibold tracking-wide shadow-[0_2px_3px_rgba(0,0,0,0.35)] hover:brightness-110"
+        className="pointer-events-auto absolute top-[30px] right-[-46px] flex w-[200px] rotate-45 items-center justify-center gap-1.5 py-1.5 text-xs font-semibold tracking-wide shadow-lg ring-1 ring-white/15 transition hover:brightness-125"
         style={{ backgroundColor: color, color: readableOn(color) }}
       >
-        <span className="block border-y border-dashed border-current/60 py-[3px]">{ribbon.label}</span>
+        <GitHub aria-hidden className="size-3.5" />
+        {ribbon.label}
       </SmartLink>
     </div>
   );

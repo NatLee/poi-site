@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import site from '../site.config.ts';
 import { colorModeScript, nextMode, storageKey } from './color-mode.ts';
-import { contrast, INK, PAPER, parseHex, readableOn } from './color.ts';
+import { contrast, INK, inkOn, PAPER, parseHex, readableOn } from './color.ts';
 import { renderHead } from './head.ts';
 import { isExternal, withBase } from './paths.ts';
 
@@ -23,17 +23,25 @@ describe('withBase', () => {
 
 describe('colours', () => {
   it('parses short and long hex', () => {
-    expect(parseHex('#e89980')).toEqual([232, 153, 128]);
+    expect(parseHex('#fb923c')).toEqual([251, 146, 60]);
     expect(parseHex('#fff')).toEqual([255, 255, 255]);
     expect(() => parseHex('salmon')).toThrow(/hex/);
   });
 
   it('picks the readable text colour', () => {
-    // White on the old salmon band was only ~2.3:1; dark text gives ~6.6:1.
-    expect(readableOn('#e89980')).toBe(INK);
-    expect(contrast(readableOn('#e89980'), '#e89980')).toBeGreaterThan(4.5);
+    // White on light orange is only ~2.3:1; dark text is well over 4.5:1.
+    expect(readableOn('#fb923c')).toBe(INK);
+    expect(contrast(readableOn('#fb923c'), '#fb923c')).toBeGreaterThan(4.5);
+    expect(readableOn('#2dd4bf')).toBe(INK);
     expect(readableOn('#aa0000')).toBe(PAPER);
     expect(readableOn('#1e3a8a')).toBe(PAPER);
+  });
+
+  it('darkens a light primary until it is readable as text on white', () => {
+    const ink = inkOn('#2dd4bf');
+    expect(contrast(ink, '#ffffff')).toBeGreaterThanOrEqual(4.5);
+    expect(ink).not.toBe('#2dd4bf');
+    expect(inkOn('#1e3a8a')).toBe('#1e3a8a'); // already dark enough: unchanged
   });
 });
 

@@ -1,51 +1,43 @@
-import { Box } from '../components/Box.tsx';
-import { ButtonLink } from '../components/ButtonLink.tsx';
-import { cn } from '../lib/cn.ts';
+import { ArrowLink } from '../components/ArrowLink.tsx';
+import { SectionHeading } from '../components/SectionHeading.tsx';
+import { readableOn } from '../lib/color.ts';
 import type { FeaturesSection } from '../types.ts';
 
 interface Props {
   section: FeaturesSection;
-  /** Colours for icons without their own `color`, used in turn. */
+  /** Colours for icon tiles without their own `color`, used in turn. */
   accents: string[];
 }
 
-/** Features in a two-column grid with thin dividers, each with a round coloured icon. */
+/** A tinted full-width band with features in two columns: icon tile on the left, text on the right. */
 export function FeatureGrid({ section, accents }: Props) {
   return (
-    <Box>
-      {section.title && (
-        <h2 id={`${section.id}-title`} className="px-6 pt-12 text-center text-4xl">
-          {section.title}
-        </h2>
-      )}
-      <ul className="grid md:grid-cols-2">
-        {section.items.map((feature, i) => {
-          const Icon = feature.icon;
-          const color = feature.color ?? accents[i % accents.length] ?? '#737373';
-          return (
-            <li
-              key={feature.title}
-              className={cn(
-                'flex flex-col items-center border-neutral-200 px-8 py-12 text-center md:px-12 dark:border-neutral-800',
-                i > 0 && 'border-t',
-                i === 1 && 'md:border-t-0',
-                i % 2 === 0 && 'md:border-r',
-              )}
-            >
-              <span
-                aria-hidden
-                className="grid size-22 place-items-center rounded-full text-white"
-                style={{ backgroundColor: color }}
-              >
-                <Icon aria-hidden className="size-10" strokeWidth={2.25} />
-              </span>
-              <h3 className="mt-8 text-2xl">{feature.title}</h3>
-              <p className="mt-3 max-w-md flex-1">{feature.text}</p>
-              {feature.action && <ButtonLink action={feature.action} surface="card" className="mt-8" />}
-            </li>
-          );
-        })}
-      </ul>
-    </Box>
+    <div className="border-y border-slate-200 bg-slate-50 py-20 sm:py-28 dark:border-white/5 dark:bg-slate-900/40">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {section.title && <SectionHeading id={`${section.id}-title`} title={section.title} intro={section.intro} className="mb-14" />}
+        <ul className="mx-auto grid max-w-5xl gap-x-12 gap-y-12 md:grid-cols-2">
+          {section.items.map((feature, i) => {
+            const Icon = feature.icon;
+            const color = feature.color ?? accents[i % accents.length] ?? '#64748b';
+            return (
+              <li key={feature.title} className="flex gap-5">
+                <span
+                  aria-hidden
+                  className="grid size-12 shrink-0 place-items-center rounded-xl shadow-sm ring-1 ring-black/5"
+                  style={{ backgroundColor: color, color: readableOn(color) }}
+                >
+                  <Icon aria-hidden className="size-6" strokeWidth={2} />
+                </span>
+                <div className="flex flex-col">
+                  <h3 className="text-lg leading-7">{feature.title}</h3>
+                  <p className="mt-1.5 text-[15px] leading-7">{feature.text}</p>
+                  {feature.action && <ArrowLink link={feature.action} className="mt-3 self-start" />}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
   );
 }

@@ -32,12 +32,15 @@ describe('page content comes from the config', () => {
     renderApp();
     expect(screen.getByRole('heading', { level: 1, name: 'POI' })).toBeInTheDocument();
     expect(screen.getByText(site.hero.tagline)).toBeInTheDocument();
-    for (const name of ['Features', 'Available Plugins', 'Guides for developers', 'Electron', 'React', 'ReactBootstrap', 'The MIT License', 'Contributors']) {
+    for (const name of ['Features', 'Available Plugins', 'Guides for developers', 'Built with', 'Electron', 'React', 'ReactBootstrap', 'The MIT License', 'Contributors']) {
       expect(screen.getByRole('heading', { name })).toBeInTheDocument();
     }
-    expect(screen.getByText('Proxy / Cache / Analysis / Notification / Plugin Support')).toBeInTheDocument();
+    for (const item of ['Proxy', 'Cache', 'Analysis', 'Notification', 'Plugin Support']) {
+      expect(screen.getByText(item)).toBeInTheDocument();
+    }
     expect(screen.getByText('poi poi poi poi')).toBeInTheDocument();
     expect(screen.getByText('© POI. All rights reserved.')).toBeInTheDocument();
+    expect(screen.getByText(site.footer.note!)).toBeInTheDocument();
   });
 
   it('renders every configured link with its original target', () => {
@@ -94,61 +97,64 @@ describe('header', () => {
   it('turns into a solid bar after scrolling past half of the hero, and back', () => {
     renderApp();
     const header = document.querySelector('header')!;
-    expect(header.className).toContain('absolute');
+    expect(header).toHaveAttribute('data-solid', 'false');
     act(() => {
       window.scrollY = 500;
       fireEvent.scroll(window);
     });
-    expect(header.className).toContain('fixed');
+    expect(header).toHaveAttribute('data-solid', 'true');
     act(() => {
       window.scrollY = 0;
       fireEvent.scroll(window);
     });
-    expect(header.className).toContain('absolute');
+    expect(header).toHaveAttribute('data-solid', 'false');
   });
 });
 
 describe('mobile menu', () => {
-  it('opens from the button and closes with Escape, a link tap or a left swipe', async () => {
+  it('opens from the header button and closes with Escape, the close button, a link tap or a right swipe', async () => {
     const user = userEvent.setup();
     renderApp();
-    const toggle = screen.getByRole('button', { name: 'Open menu' });
+    const open = screen.getByRole('button', { name: 'Open menu' });
     const panel = document.getElementById('mobile-menu')!;
     const page = document.getElementById('top')!;
+    const isOpen = () => open.getAttribute('aria-expanded') === 'true';
     expect(panel).toHaveAttribute('inert');
 
-    await user.click(toggle);
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await user.click(open);
+    expect(isOpen()).toBe(true);
     expect(panel).not.toHaveAttribute('inert');
-    expect(page).toHaveAttribute('inert'); // the page behind cannot be tabbed into
-    expect(page.className).toContain('max-md:translate-x-[275px]'); // and is pushed aside
+    expect(page).toHaveAttribute('inert'); // the page behind cannot be clicked or tabbed into
+    expect(within(panel).getByRole('link', { name: 'Home' })).toHaveFocus();
 
     await user.keyboard('{Escape}');
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(toggle).toHaveFocus();
+    expect(isOpen()).toBe(false);
+    expect(open).toHaveFocus();
 
-    await user.click(toggle);
+    await user.click(open);
+    await user.click(within(panel).getByRole('button', { name: 'Close menu' }));
+    expect(isOpen()).toBe(false);
+
+    await user.click(open);
     await user.click(within(panel).getByRole('link', { name: 'Home' }));
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(isOpen()).toBe(false);
 
-    await user.click(toggle);
-    fireEvent.touchStart(panel, { touches: [{ clientX: 200, clientY: 100 }] });
-    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 60, clientY: 110 }] });
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await user.click(open);
+    fireEvent.touchStart(panel, { touches: [{ clientX: 220, clientY: 100 }] });
+    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 90, clientY: 110 }] });
+    expect(isOpen()).toBe(true); // swiping left does nothing
+    fireEvent.touchStart(panel, { touches: [{ clientX: 60, clientY: 100 }] });
+    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 200, clientY: 110 }] });
+    expect(isOpen()).toBe(false);
   });
 
-  it('closes when the window becomes wide enough for the desktop header', async () => {
+  it('does not stay open on a screen wide enough for the desktop header', async () => {
     const user = userEvent.setup();
     renderApp();
-    const toggle = screen.getByRole('button', { name: 'Open menu' });
-    await user.click(toggle);
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
     media.isDesktop = true;
     try {
-      // The effect checks the media query again whenever the menu opens.
-      await user.click(toggle);
-      await user.click(toggle);
-      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+      await user.click(screen.getByRole('button', { name: 'Open menu' }));
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
     } finally {
       media.isDesktop = false;
     }
