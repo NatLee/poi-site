@@ -1,6 +1,7 @@
 {
   "name": "poi-site",
   "private": true,
+  "license": "MIT",
   "version": "0.0.0",
   "description": "A reusable one-page landing site template (React + Tailwind CSS). Demo content: poi, the KanColle browser.",
   "type": "module",
