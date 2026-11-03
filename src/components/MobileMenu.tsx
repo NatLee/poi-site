@@ -1,6 +1,8 @@
 import { X } from 'lucide-react';
 import { useEffect, useRef, type RefObject, type TouchEvent } from 'react';
+import { PAGE_IDS } from '../lib/anchors.ts';
 import { cn } from '../lib/cn.ts';
+import { useLabels } from '../lib/labels.ts';
 import { asset } from '../lib/paths.ts';
 import { panelTone } from '../lib/tone.ts';
 import type { SiteConfig } from '../types.ts';
@@ -9,33 +11,32 @@ import type { HeaderControls } from './Header.tsx';
 import { SmartLink } from './SmartLink.tsx';
 import { SoundButton } from './SoundButton.tsx';
 
-const DESKTOP = '(min-width: 48rem)';
-
 interface Props extends HeaderControls {
   site: SiteConfig;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** The header's menu button; focus returns to it when the menu closes. */
-  returnFocusTo: RefObject<HTMLButtonElement | null>;
+  /** The header's menu button. Focus returns to it on close, and the menu closes when CSS hides it (wide screens). */
+  trigger: RefObject<HTMLButtonElement | null>;
 }
 
 /**
  * Small-screen navigation: a panel that slides in from the right over a dimmed page.
  * Tapping a link, tapping outside, pressing Escape or swiping right closes it.
  */
-export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnFocusTo }: Props) {
+export function MobileMenu({ site, open, onOpenChange, sound, colorMode, trigger }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const wasOpen = useRef(false);
+  const labels = useLabels();
 
   const close = () => onOpenChange(false);
 
   // Focus: move into the panel when it opens, back to the menu button when it closes.
   useEffect(() => {
     if (open) panelRef.current?.querySelector<HTMLElement>('nav a')?.focus();
-    else if (wasOpen.current) returnFocusTo.current?.focus();
+    else if (wasOpen.current) trigger.current?.focus();
     wasOpen.current = open;
-  }, [open, returnFocusTo]);
+  }, [open, trigger]);
 
   // Escape closes; the page behind does not scroll while the panel is open.
   useEffect(() => {
@@ -53,15 +54,18 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnF
     };
   }, [open, onOpenChange]);
 
-  // Widening the window past the breakpoint closes the panel (the header shows the links there).
+  // The menu only exists while its button is shown. Where CSS hides the button (the header
+  // shows the links instead), close the menu, so the breakpoint lives in one place: the CSS.
   useEffect(() => {
-    if (!open || typeof matchMedia !== 'function') return;
-    const query = matchMedia(DESKTOP);
-    const onChange = () => query.matches && onOpenChange(false);
-    onChange();
-    query.addEventListener('change', onChange);
-    return () => query.removeEventListener('change', onChange);
-  }, [open, onOpenChange]);
+    if (!open) return;
+    const closeIfButtonHidden = () => {
+      const button = trigger.current;
+      if (button && getComputedStyle(button).display === 'none') onOpenChange(false);
+    };
+    closeIfButtonHidden();
+    window.addEventListener('resize', closeIfButtonHidden);
+    return () => window.removeEventListener('resize', closeIfButtonHidden);
+  }, [open, onOpenChange, trigger]);
 
   const onTouchStart = (e: TouchEvent) => {
     const t = e.touches[0];
@@ -89,10 +93,10 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnF
       />
       <div
         ref={panelRef}
-        id="mobile-menu"
+        id={PAGE_IDS.menu}
         role="dialog"
         aria-modal="true"
-        aria-label="Menu"
+        aria-label={labels.menu}
         inert={!open}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
@@ -103,7 +107,7 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnF
           open ? 'translate-x-0 shadow-2xl' : 'invisible translate-x-full',
         )}
       >
-        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 dark:border-white/10">
+        <div className="flex h-(--header-height) items-center justify-between border-b border-slate-200 px-4 dark:border-white/10">
           <span className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-slate-900 dark:text-white">
             {site.brand.logo && (
               <img src={asset(site.brand.logo)} alt="" width={32} height={32} className="size-8 rounded-full" />
@@ -112,14 +116,14 @@ export function MobileMenu({ site, open, onOpenChange, sound, colorMode, returnF
           </span>
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={labels.closeMenu}
             onClick={close}
             className={cn('grid size-10 cursor-pointer place-items-center rounded-full', panelTone.text, panelTone.hover)}
           >
             <X aria-hidden className="size-5" />
           </button>
         </div>
-        <nav aria-label="Main" className="px-3 py-4">
+        <nav aria-label={labels.navigation} className="px-3 py-4">
           <ul className="space-y-1">
             {site.nav.map((link) => (
               <li key={link.label}>

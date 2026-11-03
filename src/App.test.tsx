@@ -72,6 +72,16 @@ describe('page content comes from the config', () => {
   });
 });
 
+describe('labels', () => {
+  it('uses the words from the config for its own controls, English for the rest', () => {
+    renderApp({ ...site, labels: { openMenu: '開啟選單', skipToContent: '跳到主內容', colorSystem: '跟隨系統', colorLight: '淺色' } });
+    expect(screen.getByRole('button', { name: '開啟選單' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '跳到主內容' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'Color theme: 跟隨系統. Switch to 淺色.' }).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: 'Close menu' })).toBeInTheDocument(); // not set: English default
+  });
+});
+
 describe('sound button', () => {
   it('plays the sound from the start on every click', async () => {
     const user = userEvent.setup();
@@ -148,16 +158,15 @@ describe('mobile menu', () => {
     expect(isOpen()).toBe(false);
   });
 
-  it('does not stay open on a screen wide enough for the desktop header', async () => {
+  it('closes when the window gets wide enough that CSS hides the menu button', async () => {
     const user = userEvent.setup();
     renderApp();
-    media.isDesktop = true;
-    try {
-      await user.click(screen.getByRole('button', { name: 'Open menu' }));
-      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
-    } finally {
-      media.isDesktop = false;
-    }
+    const open = screen.getByRole('button', { name: 'Open menu' });
+    await user.click(open);
+    expect(open).toHaveAttribute('aria-expanded', 'true');
+    open.style.display = 'none'; // what md:hidden does on a wide screen
+    fireEvent(window, new Event('resize'));
+    expect(open).toHaveAttribute('aria-expanded', 'false');
   });
 });
 

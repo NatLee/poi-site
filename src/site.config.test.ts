@@ -6,8 +6,10 @@
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { PAGE_IDS } from './lib/anchors.ts';
 import { isExternal } from './lib/paths.ts';
 import { parseHex } from './lib/color.ts';
+import { heroBackground } from './lib/defaults.ts';
 import site from './site.config.ts';
 
 const publicDir = fileURLToPath(new URL('../public/', import.meta.url));
@@ -39,14 +41,17 @@ describe('site.config.ts', () => {
     expect(existsSync(publicDir + file.replace(/^\/+/, ''))).toBe(true);
   });
 
-  it('section ids are unique and usable as anchors', () => {
+  it('section ids are unique, usable as anchors and not taken by the page itself', () => {
     const ids = site.sections.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const id of ids) expect(id).toMatch(/^[a-z][\w-]*$/i);
+    for (const id of ids) {
+      expect(id).toMatch(/^[a-z][\w-]*$/i);
+      expect(Object.values(PAGE_IDS), id).not.toContain(id);
+    }
   });
 
   it('every #anchor link points at a section (or #top)', () => {
-    const targets = new Set(['top', 'main', ...site.sections.map((s) => s.id)]);
+    const targets = new Set([PAGE_IDS.top, PAGE_IDS.main, ...site.sections.map((s) => s.id)]);
     for (const href of allHrefs().filter((h) => h.startsWith('#'))) {
       expect(targets, href).toContain(href.slice(1));
     }
@@ -59,7 +64,7 @@ describe('site.config.ts', () => {
   });
 
   it('hero dim is between 0 and 1', () => {
-    const dim = site.hero.background?.dim ?? 0.25;
+    const { dim } = heroBackground(site);
     expect(dim).toBeGreaterThanOrEqual(0);
     expect(dim).toBeLessThanOrEqual(1);
   });

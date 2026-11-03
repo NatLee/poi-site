@@ -1,6 +1,8 @@
 import { Menu } from 'lucide-react';
 import type { Ref } from 'react';
+import { PAGE_IDS } from '../lib/anchors.ts';
 import { cn } from '../lib/cn.ts';
+import { useLabels } from '../lib/labels.ts';
 import { asset } from '../lib/paths.ts';
 import { headerTone } from '../lib/tone.ts';
 import type { ColorMode, SiteConfig } from '../types.ts';
@@ -31,26 +33,27 @@ interface Props extends HeaderControls {
 export function Header({ site, solid, sound, colorMode, menuOpen, onOpenMenu, menuButtonRef }: Props) {
   const { brand, nav } = site;
   const tone = headerTone;
+  const labels = useLabels();
   return (
     <header
       data-solid={solid}
       className={cn(
         'group/header fixed inset-x-0 top-0 z-40 border-b transition-[background-color,border-color,box-shadow] duration-300 motion-reduce:transition-none',
         solid
-          ? 'border-slate-900/10 bg-white/80 shadow-sm backdrop-blur-lg dark:border-white/10 dark:bg-slate-950/75'
+          ? 'border-slate-900/10 bg-page/80 shadow-sm backdrop-blur-lg dark:border-white/10'
           : 'border-transparent bg-transparent',
       )}
     >
       {site.forkRibbon && <ForkRibbon ribbon={site.forkRibbon} />}
-      <div className={cn('mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:px-6', site.forkRibbon && 'lg:pr-28 2xl:pr-6')}>
-        <a href="#top" className={cn('mr-auto flex items-center gap-2.5 rounded-full text-lg font-bold tracking-tight', tone.text)}>
+      <div className={cn('mx-auto flex h-(--header-height) max-w-6xl items-center gap-2 px-4 sm:px-6', site.forkRibbon && 'lg:clear-ribbon')}>
+        <a href={`#${PAGE_IDS.top}`} className={cn('mr-auto flex items-center gap-2.5 rounded-full text-lg font-bold tracking-tight', tone.text)}>
           {brand.logo && (
             <img src={asset(brand.logo)} alt="" width={36} height={36} className="size-9 rounded-full ring-2 ring-white/20" />
           )}
           {brand.name}
         </a>
 
-        <nav aria-label="Main" className="hidden md:block">
+        <nav aria-label={labels.navigation} className="hidden md:block">
           <ul className="flex items-center gap-1">
             {nav.map((link) => (
               <li key={link.label}>
@@ -75,8 +78,8 @@ export function Header({ site, solid, sound, colorMode, menuOpen, onOpenMenu, me
           ref={menuButtonRef}
           type="button"
           aria-expanded={menuOpen}
-          aria-controls="mobile-menu"
-          aria-label="Open menu"
+          aria-controls={PAGE_IDS.menu}
+          aria-label={labels.openMenu}
           onClick={onOpenMenu}
           className={cn('grid size-10 cursor-pointer place-items-center rounded-full md:hidden', tone.text, tone.hover)}
         >

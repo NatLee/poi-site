@@ -1,5 +1,6 @@
 import type { SiteConfig } from '../types.ts';
 import { inkOn, parseHex, readableOn } from './color.ts';
+import { darkSurface } from './defaults.ts';
 
 /**
  * Copies the config colours into the CSS variables Tailwind reads:
@@ -12,5 +13,5 @@ export function applyTheme(site: Pick<SiteConfig, 'theme' | 'hero'>, root: HTMLE
   root.style.setProperty('--color-primary', primary);
   root.style.setProperty('--color-on-primary', readableOn(primary));
   root.style.setProperty('--color-primary-ink', inkOn(primary));
-  root.style.setProperty('--color-ink', site.hero.background?.color ?? '#0b1120');
+  root.style.setProperty('--color-ink', darkSurface(site).ink);
 }

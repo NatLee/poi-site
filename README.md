@@ -47,7 +47,7 @@ The demo content is a landing page for [poi](https://github.com/poooi/poi), a Ka
   sound, an optional "Fork me on GitHub" ribbon, and readable text and links whatever primary colour you pick.
 - **Accessible:** skip link, keyboard-friendly menu, alt text, focus rings, and an automated
   [axe](https://github.com/dequelabs/axe-core) check in the test suite.
-- **Deploys itself:** pushing to `gh-pages` (or `main`) builds and publishes to GitHub Pages.
+- **Deploys itself:** pushing to the repository's default branch builds and publishes to GitHub Pages.
 
 ## Quick start
 
@@ -119,7 +119,7 @@ Other things you can change in the config:
 
 | Setting | What it does |
 |---|---|
-| `meta` | Tab title, description, favicon, language, and the link-preview image |
+| `meta` | Tab title, description, favicon, language, link-preview image, and the public `url` (its path is where the build expects to be served) |
 | `theme.primary` | Main colour: solid buttons, links, highlights, focus rings, the glow. Button text picks black or white for contrast, and links get a darker shade on white when needed |
 | `theme.accents` | Feature icon tile colours, used in turn |
 | `hero.background` | Photo, texture tile, dark base colour (also used by the call-to-action panel), how much to darken the photo, and whether it stays still while scrolling |
@@ -128,6 +128,7 @@ Other things you can change in the config:
 | `sound` | The header sound button. Delete it to hide the button |
 | `forkRibbon` | The corner ribbon. Delete it to hide the ribbon |
 | `footer` | Icon links, copyright, small print (`note`) and a credit link |
+| `labels` | Words for the page's own controls (skip link, menu buttons, colour-mode names, screen-reader text). English unless you set them, e.g. for a `zh-Hant` site |
 
 Every field is described in [`src/types.ts`](src/types.ts); hover over a field in your editor to see it.
 `npm test` also checks the config: it fails when a file is missing from `public/`, an `#anchor` has no
@@ -168,13 +169,15 @@ Before you publish your own site, replace or delete:
 
 1. Push your copy to GitHub.
 2. In the repository, open **Settings → Pages** and set **Source** to **GitHub Actions**.
-3. Push to `gh-pages` or `main`. The [deploy workflow](.github/workflows/deploy.yml) lints, tests,
-   builds and publishes. The site appears at `https://<you>.github.io/<repo>/`.
+3. Push to the repository's default branch. The [deploy workflow](.github/workflows/deploy.yml) lints,
+   tests, builds and publishes. The site appears at `https://<you>.github.io/<repo>/`.
 
 The workflow reads the right base path from GitHub, so a copy named `my-site` is served from `/my-site/`
 and a `<you>.github.io` repository or a custom domain from `/`, without editing anything.
 
-To build for another host, set `BASE_PATH` yourself:
+Locally (`npm run dev`, `npm run build`), the base path is the path of `meta.url` in the config:
+`https://you.github.io/my-site/` builds for `/my-site/`, and no `meta.url` builds for `/`.
+To build for another place, set `BASE_PATH`:
 
 ```bash
 BASE_PATH=/ npm run build        # site at the root of a domain

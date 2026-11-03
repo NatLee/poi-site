@@ -14,6 +14,50 @@
   --color-on-primary: #0b1120;
   --color-primary-ink: #0f766e;
   --color-ink: #0b1120;
+  /* Page background; the dark value is set under .dark below. */
+  --color-page: #ffffff;
+}
+
+/*
+ * Layout values that more than one component depends on. Change them here, not in the
+ * components: the hero's bottom padding and the first section's pull-up both read
+ * --hero-overlap, and the header leaves exactly as much room as the fork ribbon needs.
+ */
+@layer base {
+  :root {
+    --header-height: 4rem;
+    /* How far the first section rises into the hero, and the space left above it. */
+    --hero-overlap: 7rem;
+    --hero-gap: 3rem;
+    /* The fork ribbon's square, and how far its band reaches in from the right edge at header height. */
+    --ribbon-size: 8rem;
+    --ribbon-reach: 7rem;
+
+    @variant sm {
+      --hero-overlap: 10rem;
+      --hero-gap: 4rem;
+    }
+    @variant lg {
+      --hero-overlap: 12rem;
+    }
+  }
+
+  .dark {
+    --color-page: var(--color-slate-950);
+  }
+}
+
+@utility pb-hero-overlap {
+  padding-bottom: calc(var(--hero-gap) + var(--hero-overlap));
+}
+
+@utility rise-into-hero {
+  margin-top: calc(-1 * var(--hero-overlap));
+}
+
+/* Right padding that keeps header content clear of the ribbon, whatever the window width. */
+@utility clear-ribbon {
+  padding-right: max(var(--spacing) * 6, calc(var(--ribbon-reach) - max(0px, (100vw - var(--container-6xl)) / 2)));
 }
 
 @layer base {
@@ -29,7 +73,7 @@
   }
 
   body {
-    @apply bg-white font-sans text-base leading-7 text-slate-600 antialiased dark:bg-slate-950 dark:text-slate-400;
+    @apply bg-page font-sans text-base leading-7 text-slate-600 antialiased dark:text-slate-400;
   }
 
   h1,

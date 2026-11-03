@@ -1,10 +1,10 @@
 name: Deploy to GitHub Pages
 
-# Builds the site and publishes it with GitHub Pages.
+# Builds the site and publishes it with GitHub Pages, from whatever the repository's default
+# branch is (gh-pages here, often main in a copy of the template).
 # One-time setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
 on:
   push:
-    branches: [gh-pages, main]
   workflow_dispatch:
 
 permissions:
@@ -12,14 +12,11 @@ permissions:
   pages: write
   id-token: write
 
-# One deployment at a time; a newer push waits instead of cancelling a running deploy.
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
   build:
     name: Build
+    # Pushes to other branches start a run that skips straight away.
+    if: github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -48,6 +45,11 @@ jobs:
   deploy:
     name: Deploy
     needs: build
+    # One deployment at a time; a newer one waits instead of cancelling a running deploy.
+    # Set on the job, not the workflow, so skipped runs from other branches never queue here.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     environment:
       name: github-pages

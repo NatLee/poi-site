@@ -1,3 +1,6 @@
+import { titleId } from '../lib/anchors.ts';
+import { cn } from '../lib/cn.ts';
+import { darkSurface } from '../lib/defaults.ts';
 import { asset } from '../lib/paths.ts';
 import type { Section, SiteConfig } from '../types.ts';
 import { CallToAction } from './CallToAction.tsx';
@@ -8,7 +11,7 @@ import { Showcase } from './Showcase.tsx';
 interface Props {
   section: Section;
   site: SiteConfig;
-  /** Pull this section up into the bottom of the hero. */
+  /** Pull this section up into the bottom of the hero (by --hero-overlap, see index.css). */
   overlapHero: boolean;
 }
 
@@ -33,16 +36,16 @@ export function SectionView({ section, site, overlapHero }: Props) {
       body = <FeatureGrid section={section} accents={site.theme.accents} />;
       break;
     case 'cta': {
-      const pattern = site.hero.background?.pattern;
-      body = <CallToAction section={section} pattern={pattern ? asset(pattern) : undefined} />;
+      const { texture } = darkSurface(site);
+      body = <CallToAction section={section} texture={texture ? asset(texture) : undefined} />;
       break;
     }
   }
   return (
     <section
       id={section.id}
-      aria-labelledby={hasTitle(section) ? `${section.id}-title` : undefined}
-      className="relative scroll-mt-20"
+      aria-labelledby={hasTitle(section) ? titleId(section.id) : undefined}
+      className={cn('relative scroll-mt-[calc(var(--header-height)+1rem)]', overlapHero && 'rise-into-hero')}
     >
       {body}
     </section>
