@@ -1,0 +1,198 @@
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import axe from 'axe-core';
+import { describe, expect, it } from 'vitest';
+import { App } from './App.tsx';
+import site from './site.config.ts';
+import { media } from './test/setup.ts';
+import type { SiteConfig } from './types.ts';
+
+const BASE = import.meta.env.BASE_URL;
+
+function renderApp(config: SiteConfig = site) {
+  return render(<App site={config} />);
+}
+
+/** Every link the config defines, with the href the page should use. */
+function configLinks(config: SiteConfig) {
+  const links: { label: string; href: string }[] = [];
+  links.push(...config.nav, ...config.hero.actions);
+  for (const s of config.sections) {
+    if (s.type === 'cards') s.items.forEach((c) => c.action && links.push(c.action));
+    if (s.type === 'features') s.items.forEach((f) => f.action && links.push(f.action));
+    if (s.type === 'cta') links.push(...(s.actions ?? []));
+  }
+  if (config.footer.credits) links.push(config.footer.credits);
+  if (config.forkRibbon) links.push(config.forkRibbon);
+  return links;
+}
+
+describe('page content comes from the config', () => {
+  it('shows the hero logo, tagline and every section heading', () => {
+    renderApp();
+    expect(screen.getByRole('heading', { level: 1, name: 'POI' })).toBeInTheDocument();
+    expect(screen.getByText(site.hero.tagline)).toBeInTheDocument();
+    for (const name of ['Features', 'Available Plugins', 'Guides for developers', 'Electron', 'React', 'ReactBootstrap', 'The MIT License', 'Contributors']) {
+      expect(screen.getByRole('heading', { name })).toBeInTheDocument();
+    }
+    expect(screen.getByText('Proxy / Cache / Analysis / Notification / Plugin Support')).toBeInTheDocument();
+    expect(screen.getByText('poi poi poi poi')).toBeInTheDocument();
+    expect(screen.getByText('© POI. All rights reserved.')).toBeInTheDocument();
+  });
+
+  it('renders every configured link with its original target', () => {
+    renderApp();
+    const anchors = [...document.querySelectorAll('a')];
+    for (const link of configLinks(site)) {
+      const match = anchors.find((a) => a.textContent?.trim() === link.label && a.getAttribute('href') === link.href);
+      expect(match, `${link.label} → ${link.href}`).toBeTruthy();
+    }
+    // Footer icon link
+    expect(within(screen.getByRole('contentinfo')).getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/poooi/poi',
+    );
+  });
+
+  it('prefixes images from public/ with the base path', () => {
+    renderApp();
+    expect(screen.getByRole('img', { name: 'POI' })).toHaveAttribute('src', `${BASE}images/header.png`);
+    expect(screen.getByRole('img', { name: 'Screenshot of poi' })).toHaveAttribute('src', `${BASE}images/pic01.png`);
+  });
+
+  it('drops optional parts that are left out of the config', () => {
+    const bare: SiteConfig = { ...site, sound: undefined, forkRibbon: undefined, theme: { ...site.theme, toggle: false } };
+    renderApp(bare);
+    expect(screen.queryByRole('button', { name: /play poi/i })).toBeNull();
+    expect(screen.queryByText('Fork me on GitHub')).toBeNull();
+    expect(screen.queryByRole('button', { name: /color theme/i })).toBeNull();
+  });
+});
+
+describe('sound button', () => {
+  it('plays the sound from the start on every click', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const [button] = screen.getAllByRole('button', { name: 'Play POI' });
+    const play = HTMLMediaElement.prototype.play as unknown as { mock: { calls: unknown[]; contexts: HTMLAudioElement[] } };
+    const before = play.mock.calls.length;
+    await user.click(button);
+    await user.click(button);
+    expect(play.mock.calls.length - before).toBe(2);
+    const audio = play.mock.contexts.at(-1)!;
+    expect(audio.src).toContain(`${BASE}POI.mp3`);
+    expect(audio.currentTime).toBe(0);
+  });
+
+  it('is also in the mobile menu (the old site had no way to play it on phones)', () => {
+    renderApp();
+    expect(within(document.getElementById('mobile-menu')!).getByRole('button', { name: 'Play POI' })).toBeInTheDocument();
+  });
+});
+
+describe('header', () => {
+  it('turns into a solid bar after scrolling past half of the hero, and back', () => {
+    renderApp();
+    const header = document.querySelector('header')!;
+    expect(header.className).toContain('absolute');
+    act(() => {
+      window.scrollY = 500;
+      fireEvent.scroll(window);
+    });
+    expect(header.className).toContain('fixed');
+    act(() => {
+      window.scrollY = 0;
+      fireEvent.scroll(window);
+    });
+    expect(header.className).toContain('absolute');
+  });
+});
+
+describe('mobile menu', () => {
+  it('opens from the button and closes with Escape, a link tap or a left swipe', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const toggle = screen.getByRole('button', { name: 'Open menu' });
+    const panel = document.getElementById('mobile-menu')!;
+    const page = document.getElementById('top')!;
+    expect(panel).toHaveAttribute('inert');
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(panel).not.toHaveAttribute('inert');
+    expect(page).toHaveAttribute('inert'); // the page behind cannot be tabbed into
+    expect(page.className).toContain('max-md:translate-x-[275px]'); // and is pushed aside
+
+    await user.keyboard('{Escape}');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveFocus();
+
+    await user.click(toggle);
+    await user.click(within(panel).getByRole('link', { name: 'Home' }));
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(toggle);
+    fireEvent.touchStart(panel, { touches: [{ clientX: 200, clientY: 100 }] });
+    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 60, clientY: 110 }] });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('closes when the window becomes wide enough for the desktop header', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const toggle = screen.getByRole('button', { name: 'Open menu' });
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    media.isDesktop = true;
+    try {
+      // The effect checks the media query again whenever the menu opens.
+      await user.click(toggle);
+      await user.click(toggle);
+      expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    } finally {
+      media.isDesktop = false;
+    }
+  });
+});
+
+describe('accessibility', () => {
+  // jsdom cannot compute colours, so contrast is checked separately (lib.test.ts) and by eye.
+  const options = { rules: { 'color-contrast': { enabled: false } } };
+
+  it('has no axe violations, with the mobile menu closed or open', async () => {
+    const user = userEvent.setup();
+    const { container } = renderApp();
+    expect((await axe.run(container, options)).violations).toEqual([]);
+    await user.click(screen.getByRole('button', { name: 'Open menu' }));
+    expect((await axe.run(container, options)).violations).toEqual([]);
+  });
+});
+
+describe('colour mode', () => {
+  it('starts from the system setting and cycles System → Light → Dark, remembering the choice', async () => {
+    const user = userEvent.setup();
+    media.prefersDark = true;
+    try {
+      renderApp();
+      const root = document.documentElement;
+      expect(root).toHaveClass('dark');
+      const [toggle] = screen.getAllByRole('button', { name: /color theme: system/i });
+
+      await user.click(toggle);
+      expect(root).not.toHaveClass('dark');
+      expect(localStorage.getItem(`${BASE}:color-mode`)).toBe('light');
+
+      await user.click(screen.getAllByRole('button', { name: /color theme: light/i })[0]);
+      expect(root).toHaveClass('dark');
+      expect(localStorage.getItem(`${BASE}:color-mode`)).toBe('dark');
+    } finally {
+      media.prefersDark = false;
+    }
+  });
+
+  it('uses a saved choice over the default', () => {
+    localStorage.setItem(`${BASE}:color-mode`, 'dark');
+    renderApp();
+    expect(document.documentElement).toHaveClass('dark');
+  });
+});
